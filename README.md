@@ -1,76 +1,69 @@
-# ChillWave Admin Dashboard
+# Bảng điều khiển quản trị ChillWave
 
-Ứng dụng quản trị viên cho hệ thống âm nhạc ChillWave - một trang web admin chuyên nghiệp với đầy đủ tính năng CRUD để quản lý người dùng, nghệ sĩ, bài hát và album.
+Một bảng điều khiển quản trị chuyên nghiệp cho hệ thống âm nhạc ChillWave, được xây dựng bằng React và TypeScript. Ứng dụng này cung cấp chức năng CRUD đầy đủ để quản lý người dùng, nghệ sĩ, bài hát và album với giao diện hiện đại và trực quan.
 
 ## ✨ Tính năng
 
 ### 🎯 Quản lý toàn diện
 
-- **Dashboard**: Tổng quan hệ thống với thống kê và biểu đồ
-- **Quản lý người dùng**: CRUD hoàn chỉnh cho users với vai trò admin/user
-- **Quản lý nghệ sĩ**: Thêm, sửa, xóa nghệ sĩ với thông tin chi tiết
-- **Quản lý bài hát**: Upload và quản lý bài hát với metadata đầy đủ
-- **Quản lý album**: Tạo và quản lý album với danh sách bài hát
+- **Bảng điều khiển (Dashboard)**: Tổng quan hệ thống với các số liệu thống kê thời gian thực và hoạt động gần đây.
+- **Quản lý người dùng**: CRUD đầy đủ cho người dùng, với phân quyền (quản trị viên/người dùng).
+- **Quản lý nghệ sĩ**: Thêm, sửa và xóa nghệ sĩ với thông tin chi tiết.
+- **Quản lý bài hát**: Tải lên và quản lý bài hát với siêu dữ liệu hoàn chỉnh.
+- **Quản lý album**: Tạo và quản lý album cũng như danh sách bài hát trong đó.
 
-### 🎨 UI/UX Chuyên nghiệp
+### 🎨 Giao diện & Trải nghiệm người dùng chuyên nghiệp (UI/UX)
 
-- **Material-UI**: Thiết kế hiện đại, responsive
-- **DataGrid**: Bảng dữ liệu mạnh mẽ với tìm kiếm, lọc, phân trang
-- **Sidebar Navigation**: Điều hướng thông minh với highlight active
-- **Modal Dialogs**: Form nhập liệu thân thiện với validation
-- **Snackbar Notifications**: Thông báo realtime cho mọi thao tác
+- **Material-UI (MUI)**: Thiết kế hiện đại, đáp ứng (responsive).
+- **DataGrid**: Bảng dữ liệu mạnh mẽ với chức năng tìm kiếm và sắp xếp phía máy khách.
+- **Điều hướng thông minh**: Thanh bên (sidebar) với chức năng tô sáng trang đang hoạt động.
+- **Hộp thoại (Modal Dialogs)**: Các biểu mẫu thân thiện với người dùng để nhập dữ liệu.
+- **Thông báo (Snackbar)**: Phản hồi thời gian thực cho mọi hoạt động.
 
-### 🔥 Công nghệ hiện đại
+### 🔥 Công nghệ cốt lõi
 
-- **React 19** với TypeScript
-- **Firebase Firestore** cho database
-- **Material-UI v7** cho UI components
-- **React Router** cho routing
-- **Date-fns** cho xử lý ngày tháng
+- **React** & **TypeScript**
+- **Firebase Firestore** cho cơ sở dữ liệu
+- **Material-UI (MUI)** cho các thành phần giao diện
+- **React Router** để điều hướng trang
+- **Date-fns** để xử lý ngày tháng
 
 ## 🏗️ Cấu trúc dự án
 
 ```
 src/
 ├── components/
-│   ├── Layout/
-│   │   └── AdminLayout.tsx      # Layout chính với sidebar
-│   └── Common/
-│       └── DataTable.tsx        # Component bảng dữ liệu tái sử dụng
+│   ├── Layout/AdminLayout.tsx   # Layout chính với sidebar
+│   └── Common/DataTable.tsx     # Component bảng dữ liệu có thể tái sử dụng
 ├── config/
-│   └── firebase.ts              # Cấu hình Firebase
+│   └── firebase.ts            # Cấu hình Firebase
 ├── models/
-│   ├── User.ts                  # Interface cho User
-│   ├── Artist.ts                # Interface cho Artist
-│   ├── Song.ts                  # Interface cho Song
-│   └── Album.ts                 # Interface cho Album
+│   ├── User.ts                # Interface TypeScript cho Người dùng
+│   ├── Artist.ts              # Interface TypeScript cho Nghệ sĩ
+│   ├── Song.ts                # Interface TypeScript cho Bài hát
+│   └── Album.ts               # Interface TypeScript cho Album
 ├── services/
-│   ├── UserService.ts           # CRUD operations cho Users
-│   ├── ArtistService.ts         # CRUD operations cho Artists
-│   ├── SongService.ts           # CRUD operations cho Songs
-│   └── AlbumService.ts          # CRUD operations cho Albums
+│   ├── UserService.ts         # CRUD Firestore cho Người dùng
+│   ├── ArtistService.ts       # CRUD Firestore cho Nghệ sĩ
+│   ├── SongService.ts         # CRUD Firestore cho Bài hát
+│   └── AlbumService.ts        # CRUD Firestore cho Album
 ├── pages/
-│   ├── Dashboard/
-│   │   └── Dashboard.tsx        # Trang tổng quan
-│   ├── Users/
-│   │   └── UsersPage.tsx        # Quản lý users
-│   ├── Artists/
-│   │   └── ArtistsPage.tsx      # Quản lý artists
-│   ├── Songs/
-│   │   └── SongsPage.tsx        # Quản lý songs
-│   └── Albums/
-│       └── AlbumsPage.tsx       # Quản lý albums
-└── App.js                       # Main App component
+│   ├── Dashboard/Dashboard.tsx  # Trang tổng quan
+│   ├── Users/UsersPage.tsx      # Trang quản lý người dùng
+│   ├── Artists/ArtistsPage.tsx  # Trang quản lý nghệ sĩ
+│   ├── Songs/SongsPage.tsx      # Trang quản lý bài hát
+│   └── Albums/AlbumsPage.tsx    # Trang quản lý album
+└── App.tsx                      # Component App chính với định tuyến (routing)
 ```
 
-## 🚀 Cài đặt và Chạy
+## 🚀 Cài đặt
 
-### Yêu cầu hệ thống
+### Yêu cầu
 
-- Node.js 16+
+- Node.js (phiên bản 16 trở lên)
 - npm hoặc yarn
 
-### Cài đặt dependencies
+### Cài đặt
 
 ```bash
 npm install
@@ -78,9 +71,10 @@ npm install
 
 ### Cấu hình Firebase
 
-1. Tạo project trên [Firebase Console](https://console.firebase.google.com/)
-2. Tạo Firestore Database
-3. Cập nhật cấu hình trong `src/config/firebase.ts` với thông tin project của bạn
+1.  Tạo một dự án trên [Bảng điều khiển Firebase](https://console.firebase.google.com/).
+2.  Thiết lập một Cơ sở dữ liệu Firestore.
+3.  Trong cài đặt dự án của bạn, tìm đối tượng cấu hình cho ứng dụng web của bạn.
+4.  Sao chép cấu hình Firebase của bạn và dán vào `src/config/firebase.ts`.
 
 ### Chạy ứng dụng
 
@@ -88,194 +82,90 @@ npm install
 npm start
 ```
 
-Ứng dụng sẽ chạy tại `http://localhost:3000`
+Ứng dụng sẽ có sẵn tại `http://localhost:3000`.
 
-### Build cho production
+### Xây dựng cho Production
 
 ```bash
 npm run build
 ```
 
-## 📊 Database Schema
+## 📊 Lược đồ Firestore (Schema)
 
-### Collections trong Firestore
+Cơ sở dữ liệu sử dụng các collection và lược đồ sau:
 
-#### Users
+#### `users`
 
 ```typescript
 {
-  id: string;
-  email: string;
-  displayName: string;
-  photoURL?: string;
-  role: 'admin' | 'user';
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  lastLoginAt?: Date;
-  favoriteArtists?: string[];
-  favoriteSongs?: string[];
-  favoriteAlbums?: string[];
+  uid: string,
+  username: string,
+  email: string,
+  phone: string, 
+  photoURL: string,
+  role: 'admin' | 'user',
+  createdAt: Date
 }
 ```
 
-#### Artists
+#### `artists`
 
 ```typescript
 {
-  id: string;
-  name: string;
-  bio: string;
-  imageURL?: string;
-  country: string;
-  genre: string[];
+  artist_name: string,
+  artist_images: string,
+  bio: string,
+  country: string,
+  genre: string[],
+  love_count: number,
   socialLinks: {
     spotify?: string;
     youtube?: string;
     instagram?: string;
     facebook?: string;
-  };
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  songsCount: number;
-  albumsCount: number;
-  followersCount: number;
+  }
 }
 ```
 
-#### Songs
+#### `songs`
 
 ```typescript
 {
-  id: string;
-  title: string;
-  artistId: string;
-  artistName: string;
-  albumId?: string;
-  albumName?: string;
-  duration: number; // in seconds
-  audioURL: string;
-  imageURL?: string;
-  genre: string[];
-  releaseDate: Date;
-  lyrics?: string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  playCount: number;
-  likesCount: number;
-  isExplicit: boolean;
+  song_name: string,
+  artist_id: string[],
+  album_id?: string,
+  duration: number,
+  audio_url: string,
+  song_imageUrl: string,
+  genre: string[],
+  year: number, 
+  lyrics?: string,
+  isExplicit: boolean,
+  play_count: number,
+  love_count: number
 }
 ```
 
-#### Albums
+#### `albums`
 
 ```typescript
 {
-  id: string;
-  title: string;
-  artistId: string;
-  artistName: string;
-  description: string;
-  imageURL?: string;
-  genre: string[];
-  releaseDate: Date;
-  trackList: string[]; // song IDs
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  playCount: number;
-  likesCount: number;
-  type: 'album' | 'single' | 'ep';
+  album_name: string,
+  artist_id: string,
+  description: string,
+  album_image: string,
+  genre: string[],
+  releaseDate: Date,
+  trackList: string[],
+  isActive: boolean,
+  type: 'album' | 'single' | 'ep'
 }
 ```
 
-## 🎨 Tính năng nổi bật
+## 🧑‍💻 Nhà phát triển
 
-### Dashboard Analytics
-
-- Thống kê tổng quan: số users, artists, songs, albums
-- Biểu đồ tăng trưởng theo thời gian
-- Hoạt động gần đây
-- Các chỉ số quan trọng
-
-### CRUD Operations
-
-- **Create**: Form modal với validation đầy đủ
-- **Read**: DataGrid với tìm kiếm, lọc, sắp xếp
-- **Update**: Edit inline hoặc modal form
-- **Delete**: Xác nhận trước khi xóa
-
-### Advanced Features
-
-- Upload và quản lý files (ảnh, audio)
-- Multi-select cho genres, social links
-- Date picker cho ngày phát hành
-- Status toggle (active/inactive)
-- Relationship management (artist-album-song)
-
-## 🔧 Customization
-
-### Thêm field mới
-
-1. Cập nhật interface trong `src/models/`
-2. Thêm field vào form trong page component
-3. Cập nhật service method
-
-### Thêm page mới
-
-1. Tạo component trong `src/pages/`
-2. Thêm route trong `src/App.js`
-3. Thêm menu item trong `AdminLayout.tsx`
-
-### Styling
-
-- Cập nhật theme trong `src/App.js`
-- Customize component styles trong từng file
-- Sử dụng Material-UI sx prop cho inline styling
-
-## 📝 Best Practices
-
-### Code Organization
-
-- Separation of concerns: models, services, components
-- Reusable components
-- TypeScript interfaces cho type safety
-- Consistent naming conventions
-
-### Performance
-
-- Lazy loading cho components
-- Memoization cho expensive operations
-- Efficient Firebase queries
-- Image optimization
-
-### Security
-
-- Input validation
-- Firebase security rules
-- Authentication checks
-- CORS configuration
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
-## 👥 Contact
-
-- **Developer**: [Your Name]
-- **Email**: [your.email@example.com]
-- **Project Link**: [https://github.com/yourusername/chillwave-admin](https://github.com/yourusername/chillwave-admin)
+- **Tên**: Phan Văn Huy
+- **GitHub**: [@PVanHuy](https://github.com/PVanHuy/Admin_Chillwave_App)
+- **Email**: huy0812200415@gmail.com
 
 ---
-
-⭐ **Nếu project hữu ích, hãy give một star!** ⭐
