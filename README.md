@@ -1,70 +1,281 @@
-# Getting Started with Create React App
+# ChillWave Admin Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Ứng dụng quản trị viên cho hệ thống âm nhạc ChillWave - một trang web admin chuyên nghiệp với đầy đủ tính năng CRUD để quản lý người dùng, nghệ sĩ, bài hát và album.
 
-## Available Scripts
+## ✨ Tính năng
 
-In the project directory, you can run:
+### 🎯 Quản lý toàn diện
 
-### `npm start`
+- **Dashboard**: Tổng quan hệ thống với thống kê và biểu đồ
+- **Quản lý người dùng**: CRUD hoàn chỉnh cho users với vai trò admin/user
+- **Quản lý nghệ sĩ**: Thêm, sửa, xóa nghệ sĩ với thông tin chi tiết
+- **Quản lý bài hát**: Upload và quản lý bài hát với metadata đầy đủ
+- **Quản lý album**: Tạo và quản lý album với danh sách bài hát
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🎨 UI/UX Chuyên nghiệp
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Material-UI**: Thiết kế hiện đại, responsive
+- **DataGrid**: Bảng dữ liệu mạnh mẽ với tìm kiếm, lọc, phân trang
+- **Sidebar Navigation**: Điều hướng thông minh với highlight active
+- **Modal Dialogs**: Form nhập liệu thân thiện với validation
+- **Snackbar Notifications**: Thông báo realtime cho mọi thao tác
 
-### `npm test`
+### 🔥 Công nghệ hiện đại
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **React 19** với TypeScript
+- **Firebase Firestore** cho database
+- **Material-UI v7** cho UI components
+- **React Router** cho routing
+- **Date-fns** cho xử lý ngày tháng
 
-### `npm run build`
+## 🏗️ Cấu trúc dự án
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+src/
+├── components/
+│   ├── Layout/
+│   │   └── AdminLayout.tsx      # Layout chính với sidebar
+│   └── Common/
+│       └── DataTable.tsx        # Component bảng dữ liệu tái sử dụng
+├── config/
+│   └── firebase.ts              # Cấu hình Firebase
+├── models/
+│   ├── User.ts                  # Interface cho User
+│   ├── Artist.ts                # Interface cho Artist
+│   ├── Song.ts                  # Interface cho Song
+│   └── Album.ts                 # Interface cho Album
+├── services/
+│   ├── UserService.ts           # CRUD operations cho Users
+│   ├── ArtistService.ts         # CRUD operations cho Artists
+│   ├── SongService.ts           # CRUD operations cho Songs
+│   └── AlbumService.ts          # CRUD operations cho Albums
+├── pages/
+│   ├── Dashboard/
+│   │   └── Dashboard.tsx        # Trang tổng quan
+│   ├── Users/
+│   │   └── UsersPage.tsx        # Quản lý users
+│   ├── Artists/
+│   │   └── ArtistsPage.tsx      # Quản lý artists
+│   ├── Songs/
+│   │   └── SongsPage.tsx        # Quản lý songs
+│   └── Albums/
+│       └── AlbumsPage.tsx       # Quản lý albums
+└── App.js                       # Main App component
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🚀 Cài đặt và Chạy
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Yêu cầu hệ thống
 
-### `npm run eject`
+- Node.js 16+
+- npm hoặc yarn
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Cài đặt dependencies
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Cấu hình Firebase
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. Tạo project trên [Firebase Console](https://console.firebase.google.com/)
+2. Tạo Firestore Database
+3. Cập nhật cấu hình trong `src/config/firebase.ts` với thông tin project của bạn
 
-## Learn More
+### Chạy ứng dụng
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Ứng dụng sẽ chạy tại `http://localhost:3000`
 
-### Code Splitting
+### Build cho production
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+npm run build
+```
 
-### Analyzing the Bundle Size
+## 📊 Database Schema
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Collections trong Firestore
 
-### Making a Progressive Web App
+#### Users
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```typescript
+{
+  id: string;
+  email: string;
+  displayName: string;
+  photoURL?: string;
+  role: 'admin' | 'user';
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  lastLoginAt?: Date;
+  favoriteArtists?: string[];
+  favoriteSongs?: string[];
+  favoriteAlbums?: string[];
+}
+```
 
-### Advanced Configuration
+#### Artists
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```typescript
+{
+  id: string;
+  name: string;
+  bio: string;
+  imageURL?: string;
+  country: string;
+  genre: string[];
+  socialLinks: {
+    spotify?: string;
+    youtube?: string;
+    instagram?: string;
+    facebook?: string;
+  };
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  songsCount: number;
+  albumsCount: number;
+  followersCount: number;
+}
+```
 
-### Deployment
+#### Songs
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```typescript
+{
+  id: string;
+  title: string;
+  artistId: string;
+  artistName: string;
+  albumId?: string;
+  albumName?: string;
+  duration: number; // in seconds
+  audioURL: string;
+  imageURL?: string;
+  genre: string[];
+  releaseDate: Date;
+  lyrics?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  playCount: number;
+  likesCount: number;
+  isExplicit: boolean;
+}
+```
 
-### `npm run build` fails to minify
+#### Albums
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```typescript
+{
+  id: string;
+  title: string;
+  artistId: string;
+  artistName: string;
+  description: string;
+  imageURL?: string;
+  genre: string[];
+  releaseDate: Date;
+  trackList: string[]; // song IDs
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  playCount: number;
+  likesCount: number;
+  type: 'album' | 'single' | 'ep';
+}
+```
+
+## 🎨 Tính năng nổi bật
+
+### Dashboard Analytics
+
+- Thống kê tổng quan: số users, artists, songs, albums
+- Biểu đồ tăng trưởng theo thời gian
+- Hoạt động gần đây
+- Các chỉ số quan trọng
+
+### CRUD Operations
+
+- **Create**: Form modal với validation đầy đủ
+- **Read**: DataGrid với tìm kiếm, lọc, sắp xếp
+- **Update**: Edit inline hoặc modal form
+- **Delete**: Xác nhận trước khi xóa
+
+### Advanced Features
+
+- Upload và quản lý files (ảnh, audio)
+- Multi-select cho genres, social links
+- Date picker cho ngày phát hành
+- Status toggle (active/inactive)
+- Relationship management (artist-album-song)
+
+## 🔧 Customization
+
+### Thêm field mới
+
+1. Cập nhật interface trong `src/models/`
+2. Thêm field vào form trong page component
+3. Cập nhật service method
+
+### Thêm page mới
+
+1. Tạo component trong `src/pages/`
+2. Thêm route trong `src/App.js`
+3. Thêm menu item trong `AdminLayout.tsx`
+
+### Styling
+
+- Cập nhật theme trong `src/App.js`
+- Customize component styles trong từng file
+- Sử dụng Material-UI sx prop cho inline styling
+
+## 📝 Best Practices
+
+### Code Organization
+
+- Separation of concerns: models, services, components
+- Reusable components
+- TypeScript interfaces cho type safety
+- Consistent naming conventions
+
+### Performance
+
+- Lazy loading cho components
+- Memoization cho expensive operations
+- Efficient Firebase queries
+- Image optimization
+
+### Security
+
+- Input validation
+- Firebase security rules
+- Authentication checks
+- CORS configuration
+
+## 🤝 Contributing
+
+1. Fork the project
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 👥 Contact
+
+- **Developer**: [Your Name]
+- **Email**: [your.email@example.com]
+- **Project Link**: [https://github.com/yourusername/chillwave-admin](https://github.com/yourusername/chillwave-admin)
+
+---
+
+⭐ **Nếu project hữu ích, hãy give một star!** ⭐
