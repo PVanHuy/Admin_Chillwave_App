@@ -7,59 +7,34 @@ import {
   DialogActions,
   Button,
   TextField,
-  Grid,
-  Switch,
-  FormControlLabel,
+  Box,
   Alert,
   Snackbar,
-  Chip,
-  Box,
-  Autocomplete,
   Avatar,
 } from "@mui/material";
 import DataTable from "../../components/Common/DataTable";
 import { ArtistService } from "../../services/ArtistService";
-import {
-  Artist,
-  CreateArtistRequest,
-  UpdateArtistRequest,
-} from "../../models/Artist";
 
-const GENRES = [
-  "Pop",
-  "Rock",
-  "Hip Hop",
-  "R&B",
-  "Country",
-  "Jazz",
-  "Classical",
-  "Electronic",
-  "Folk",
-  "Blues",
-  "Reggae",
-  "Punk",
-  "Metal",
-  "Alternative",
-  "Indie",
-  "Soul",
-];
+// Temporary interfaces to match Firebase structure
+interface Artist {
+  id: string;
+  artist_name: string;
+  bio: string;
+  artist_images: string;
+  love_count: number;
+}
 
-const COUNTRIES = [
-  "Việt Nam",
-  "Hoa Kỳ",
-  "Anh",
-  "Canada",
-  "Úc",
-  "Pháp",
-  "Đức",
-  "Nhật Bản",
-  "Hàn Quốc",
-  "Trung Quốc",
-  "Thái Lan",
-  "Singapore",
-  "Malaysia",
-  "Philippines",
-];
+interface CreateArtistRequest {
+  artist_name: string;
+  bio: string;
+  artist_images: string;
+}
+
+interface UpdateArtistRequest {
+  artist_name?: string;
+  bio?: string;
+  artist_images?: string;
+}
 
 const ArtistsPage: React.FC = () => {
   const [artists, setArtists] = useState<Artist[]>([]);
@@ -74,19 +49,10 @@ const ArtistsPage: React.FC = () => {
     severity: "success" as "success" | "error",
   });
 
-  const [formData, setFormData] = useState({
-    name: "",
+  const [formData, setFormData] = useState<CreateArtistRequest>({
+    artist_name: "",
     bio: "",
-    imageURL: "",
-    country: "",
-    genre: [] as string[],
-    socialLinks: {
-      spotify: "" as string | undefined,
-      youtube: "" as string | undefined,
-      instagram: "" as string | undefined,
-      facebook: "" as string | undefined,
-    },
-    isActive: true,
+    artist_images: "",
   });
 
   useEffect(() => {
@@ -96,7 +62,7 @@ const ArtistsPage: React.FC = () => {
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
     const filteredData = artists.filter((item) => {
-      return item.name.toLowerCase().includes(lowercasedFilter);
+      return item.artist_name?.toLowerCase().includes(lowercasedFilter);
     });
     setFilteredArtists(filteredData);
   }, [searchTerm, artists]);
@@ -104,7 +70,8 @@ const ArtistsPage: React.FC = () => {
   const fetchArtists = async () => {
     try {
       setLoading(true);
-      const artistData = await ArtistService.getAllArtists();
+      // Casting the result to the local Artist interface
+      const artistData = (await ArtistService.getAllArtists()) as Artist[];
       setArtists(artistData);
       setFilteredArtists(artistData);
     } catch (error) {
@@ -127,34 +94,16 @@ const ArtistsPage: React.FC = () => {
     if (artist) {
       setEditingArtist(artist);
       setFormData({
-        name: artist.name,
+        artist_name: artist.artist_name,
         bio: artist.bio,
-        imageURL: artist.imageURL || "",
-        country: artist.country,
-        genre: artist.genre,
-        socialLinks: {
-          spotify: artist.socialLinks?.spotify || "",
-          youtube: artist.socialLinks?.youtube || "",
-          instagram: artist.socialLinks?.instagram || "",
-          facebook: artist.socialLinks?.facebook || "",
-        },
-        isActive: artist.isActive,
+        artist_images: artist.artist_images || "",
       });
     } else {
       setEditingArtist(null);
       setFormData({
-        name: "",
+        artist_name: "",
         bio: "",
-        imageURL: "",
-        country: "",
-        genre: [],
-        socialLinks: {
-          spotify: "",
-          youtube: "",
-          instagram: "",
-          facebook: "",
-        },
-        isActive: true,
+        artist_images: "",
       });
     }
     setDialogOpen(true);
@@ -166,43 +115,24 @@ const ArtistsPage: React.FC = () => {
   };
 
   const handleInputChange = (field: string, value: any) => {
-    if (field.startsWith("socialLinks.")) {
-      const socialField = field.split(".")[1];
-      setFormData({
-        ...formData,
-        socialLinks: {
-          ...formData.socialLinks,
-          [socialField]: value,
-        },
-      });
-    } else {
-      setFormData({ ...formData, [field]: value });
-    }
+    setFormData({ ...formData, [field]: value });
   };
 
   const handleSubmit = async () => {
     try {
       if (editingArtist) {
         const updates: UpdateArtistRequest = {
-          name: formData.name,
+          artist_name: formData.artist_name,
           bio: formData.bio,
-          imageURL: formData.imageURL,
-          country: formData.country,
-          genre: formData.genre,
-          socialLinks: formData.socialLinks,
-          isActive: formData.isActive,
+          artist_images: formData.artist_images,
         };
         await ArtistService.updateArtist(editingArtist.id, updates);
         showSnackbar("Cập nhật nghệ sĩ thành công", "success");
       } else {
         const newArtist: CreateArtistRequest = {
-          name: formData.name,
+          artist_name: formData.artist_name,
           bio: formData.bio,
-          imageURL: formData.imageURL,
-          country: formData.country,
-          genre: formData.genre,
-          socialLinks: formData.socialLinks,
-          isActive: formData.isActive,
+          artist_images: formData.artist_images,
         };
         await ArtistService.createArtist(newArtist);
         showSnackbar("Thêm nghệ sĩ thành công", "success");
@@ -230,7 +160,7 @@ const ArtistsPage: React.FC = () => {
 
   const columns: GridColDef[] = [
     {
-      field: "imageURL",
+      field: "artist_images",
       headerName: "Hình ảnh",
       width: 80,
       renderCell: (params) => (
@@ -246,30 +176,21 @@ const ArtistsPage: React.FC = () => {
       align: "center",
       headerAlign: "center",
     },
-    { field: "name", headerName: "Tên nghệ sĩ", flex: 2, minWidth: 180 },
+    { field: "artist_name", headerName: "Tên nghệ sĩ", flex: 2, minWidth: 180 },
     {
-      field: "songsCount",
-      headerName: "Số bài hát",
-      flex: 1,
-      minWidth: 100,
-      align: "center",
-      headerAlign: "center",
+      field: "bio",
+      headerName: "Tiểu sử",
+      flex: 3,
+      minWidth: 250,
     },
     {
-      field: "albumsCount",
-      headerName: "Số album",
-      flex: 1,
-      minWidth: 100,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "followersCount",
-      headerName: "Followers",
+      field: "love_count",
+      headerName: "Lượt yêu thích",
       flex: 1,
       minWidth: 110,
       align: "center",
       headerAlign: "center",
+      valueGetter: (value) => value || 0,
     },
   ];
 
@@ -302,32 +223,13 @@ const ArtistsPage: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                flexDirection: { xs: "column", md: "row" },
-              }}
-            >
-              <TextField
-                fullWidth
-                label="Tên nghệ sĩ"
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                required
-              />
-              <Autocomplete
-                options={COUNTRIES}
-                value={formData.country}
-                onChange={(_, value) =>
-                  handleInputChange("country", value || "")
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Quốc gia" required />
-                )}
-                sx={{ flex: 1 }}
-              />
-            </Box>
+            <TextField
+              fullWidth
+              label="Tên nghệ sĩ"
+              value={formData.artist_name}
+              onChange={(e) => handleInputChange("artist_name", e.target.value)}
+              required
+            />
 
             <TextField
               fullWidth
@@ -335,86 +237,18 @@ const ArtistsPage: React.FC = () => {
               value={formData.bio}
               onChange={(e) => handleInputChange("bio", e.target.value)}
               multiline
-              rows={3}
+              rows={4}
               required
             />
 
             <TextField
               fullWidth
               label="URL hình ảnh"
-              value={formData.imageURL}
-              onChange={(e) => handleInputChange("imageURL", e.target.value)}
-            />
-
-            <Autocomplete
-              multiple
-              options={GENRES}
-              value={formData.genre}
-              onChange={(_, value) => handleInputChange("genre", value)}
-              renderInput={(params) => (
-                <TextField {...params} label="Thể loại âm nhạc" />
-              )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    variant="outlined"
-                    label={option}
-                    {...getTagProps({ index })}
-                    key={option}
-                  />
-                ))
+              value={formData.artist_images}
+              onChange={(e) =>
+                handleInputChange("artist_images", e.target.value)
               }
             />
-
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                flexDirection: { xs: "column", md: "row" },
-              }}
-            >
-              <TextField
-                fullWidth
-                label="Spotify URL"
-                value={formData.socialLinks.spotify}
-                onChange={(e) =>
-                  handleInputChange("socialLinks.spotify", e.target.value)
-                }
-              />
-              <TextField
-                fullWidth
-                label="YouTube URL"
-                value={formData.socialLinks.youtube}
-                onChange={(e) =>
-                  handleInputChange("socialLinks.youtube", e.target.value)
-                }
-              />
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                flexDirection: { xs: "column", md: "row" },
-              }}
-            >
-              <TextField
-                fullWidth
-                label="Instagram URL"
-                value={formData.socialLinks.instagram}
-                onChange={(e) =>
-                  handleInputChange("socialLinks.instagram", e.target.value)
-                }
-              />
-              <TextField
-                fullWidth
-                label="Facebook URL"
-                value={formData.socialLinks.facebook}
-                onChange={(e) =>
-                  handleInputChange("socialLinks.facebook", e.target.value)
-                }
-              />
-            </Box>
           </Box>
         </DialogContent>
         <DialogActions>

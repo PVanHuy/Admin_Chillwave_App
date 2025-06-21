@@ -19,7 +19,13 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
-import { PersonOutline, MailOutline, PhoneOutlined } from "@mui/icons-material";
+import {
+  PersonOutline,
+  MailOutline,
+  PhoneOutlined,
+  AdminPanelSettings,
+  Person,
+} from "@mui/icons-material";
 import DataTable, { createDateColumn } from "../../components/Common/DataTable";
 import { UserService } from "../../services/UserService";
 import { User, CreateUserRequest, UpdateUserRequest } from "../../models/User";
@@ -37,13 +43,20 @@ const UsersPage: React.FC = () => {
     severity: "success" as "success" | "error",
   });
 
+  const [formErrors, setFormErrors] = useState({
+    email: "",
+    username: "",
+    phone: "",
+  });
+
   const [formData, setFormData] = useState({
     email: "",
-    displayName: "",
-    phoneNumber: "",
-    photoURL: "",
+    username: "",
+    phone: "",
+    photoUrl: "",
+    bio: "",
+    position: "",
     role: "user" as "admin" | "user",
-    isActive: true,
   });
 
   useEffect(() => {
@@ -54,14 +67,40 @@ const UsersPage: React.FC = () => {
     const lowercasedFilter = searchTerm.toLowerCase();
     const filteredData = users.filter((item) => {
       const nameMatch =
-        item.displayName?.toLowerCase().includes(lowercasedFilter) || false;
+        item.username?.toLowerCase().includes(lowercasedFilter) || false;
       const emailMatch =
         item.email?.toLowerCase().includes(lowercasedFilter) || false;
-      const phoneMatch = item.phoneNumber?.includes(lowercasedFilter) || false;
+      const phoneMatch = item.phone?.includes(lowercasedFilter) || false;
       return nameMatch || emailMatch || phoneMatch;
     });
     setFilteredUsers(filteredData);
   }, [searchTerm, users]);
+
+  const validate = (): boolean => {
+    const tempErrors = { email: "", username: "", phone: "" };
+    let isValid = true;
+
+    if (!formData.username.trim()) {
+      isValid = false;
+      tempErrors.username = "Tên người dùng không được để trống.";
+    }
+
+    if (!formData.email.trim()) {
+      isValid = false;
+      tempErrors.email = "Email không được để trống.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      isValid = false;
+      tempErrors.email = "Email không đúng định dạng.";
+    }
+
+    if (formData.phone && !/^\d{10,11}$/.test(formData.phone)) {
+      isValid = false;
+      tempErrors.phone = "Số điện thoại phải có 10 hoặc 11 chữ số.";
+    }
+
+    setFormErrors(tempErrors);
+    return isValid;
+  };
 
   const fetchUsers = async () => {
     try {
@@ -90,55 +129,68 @@ const UsersPage: React.FC = () => {
       setEditingUser(user);
       setFormData({
         email: user.email,
-        displayName: user.displayName,
-        phoneNumber: user.phoneNumber || "",
-        photoURL: user.photoURL || "",
+        username: user.username,
+        phone: user.phone || "",
+        photoUrl: user.photoUrl || "",
+        bio: user.bio || "",
+        position: user.position || "",
         role: user.role,
-        isActive: user.isActive,
       });
     } else {
       setEditingUser(null);
       setFormData({
         email: "",
-        displayName: "",
-        phoneNumber: "",
-        photoURL: "",
+        username: "",
+        phone: "",
+        photoUrl: "",
+        bio: "",
+        position: "",
         role: "user",
-        isActive: true,
       });
     }
+    setFormErrors({ email: "", username: "", phone: "" });
     setDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditingUser(null);
+    setFormErrors({ email: "", username: "", phone: "" });
   };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value });
+    if (formErrors[field as keyof typeof formErrors]) {
+      setFormErrors({ ...formErrors, [field]: "" });
+    }
   };
 
   const handleSubmit = async () => {
+    if (!validate()) {
+      return;
+    }
+
     try {
       if (editingUser) {
         const updates: UpdateUserRequest = {
-          displayName: formData.displayName,
-          phoneNumber: formData.phoneNumber,
-          photoURL: formData.photoURL,
+          username: formData.username,
+          phone: formData.phone,
+          photoUrl: formData.photoUrl,
+          bio: formData.bio,
+          position: formData.position,
           role: formData.role,
-          isActive: formData.isActive,
         };
         await UserService.updateUser(editingUser.id, updates);
         showSnackbar("Cập nhật người dùng thành công", "success");
       } else {
         const newUser: CreateUserRequest = {
           email: formData.email,
-          displayName: formData.displayName,
-          phoneNumber: formData.phoneNumber,
-          photoURL: formData.photoURL,
+          username: formData.username,
+          phone: formData.phone,
+          photoUrl: formData.photoUrl,
+          bio: formData.bio,
+          position: formData.position,
           role: formData.role,
-          isActive: formData.isActive,
         };
         await UserService.createUser(newUser);
         showSnackbar("Thêm người dùng thành công", "success");
@@ -166,7 +218,7 @@ const UsersPage: React.FC = () => {
 
   const columns: GridColDef[] = [
     {
-      field: "displayName",
+      field: "username",
       headerName: "Tên Người Dùng",
       flex: 1.5,
       minWidth: 180,
@@ -190,7 +242,7 @@ const UsersPage: React.FC = () => {
       ),
     },
     {
-      field: "phoneNumber",
+      field: "phone",
       headerName: "Số Điện Thoại",
       flex: 1,
       minWidth: 140,
@@ -201,7 +253,21 @@ const UsersPage: React.FC = () => {
         </Box>
       ),
     },
-    createDateColumn("createdAt", "Ngày tạo", true),
+    {
+      field: "role",
+      headerName: "Vai trò",
+      flex: 1,
+      minWidth: 120,
+      renderCell: (params) => (
+        <Chip
+          icon={params.value === "admin" ? <AdminPanelSettings /> : <Person />}
+          label={params.value === "admin" ? "Admin" : "User"}
+          color={params.value === "admin" ? "primary" : "default"}
+          size="small"
+        />
+      ),
+    },
+    createDateColumn("created_at", "Ngày tạo", true),
   ];
 
   return (
@@ -240,25 +306,43 @@ const UsersPage: React.FC = () => {
               onChange={(e) => handleInputChange("email", e.target.value)}
               disabled={!!editingUser}
               required
+              error={!!formErrors.email}
+              helperText={formErrors.email}
             />
             <TextField
               fullWidth
-              label="Tên hiển thị"
-              value={formData.displayName}
-              onChange={(e) => handleInputChange("displayName", e.target.value)}
+              label="Tên người dùng"
+              value={formData.username}
+              onChange={(e) => handleInputChange("username", e.target.value)}
               required
+              error={!!formErrors.username}
+              helperText={formErrors.username}
             />
             <TextField
               fullWidth
               label="Số điện thoại"
-              value={formData.phoneNumber}
-              onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+              value={formData.phone}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+              error={!!formErrors.phone}
+              helperText={formErrors.phone}
             />
             <TextField
               fullWidth
               label="URL ảnh đại diện"
-              value={formData.photoURL}
-              onChange={(e) => handleInputChange("photoURL", e.target.value)}
+              value={formData.photoUrl}
+              onChange={(e) => handleInputChange("photoUrl", e.target.value)}
+            />
+            <TextField
+              fullWidth
+              label="Tiểu sử"
+              value={formData.bio}
+              onChange={(e) => handleInputChange("bio", e.target.value)}
+            />
+            <TextField
+              fullWidth
+              label="Chức vụ"
+              value={formData.position}
+              onChange={(e) => handleInputChange("position", e.target.value)}
             />
             <Box
               sx={{
@@ -268,7 +352,7 @@ const UsersPage: React.FC = () => {
                 alignItems: "flex-start",
               }}
             >
-              <FormControl sx={{ flex: 1 }}>
+              <FormControl fullWidth>
                 <InputLabel>Vai trò</InputLabel>
                 <Select
                   value={formData.role}

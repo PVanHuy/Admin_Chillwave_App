@@ -65,13 +65,13 @@ const Dashboard: React.FC = () => {
         // Setup Recent Activities
         const activities = [];
         if (users.length > 0)
-          activities.push(`Người dùng mới nhất: ${users[0].displayName}`);
+          activities.push(`Người dùng mới nhất: ${users[0].username}`);
         if (artists.length > 0)
-          activities.push(`Nghệ sĩ mới nhất: ${artists[0].name}`);
+          activities.push(`Nghệ sĩ mới nhất: ${artists[0].artist_name}`);
         if (songs.length > 0)
-          activities.push(`Bài hát mới nhất: ${songs[0].title}`);
+          activities.push(`Bài hát mới nhất: ${songs[0].song_name}`);
         if (albums.length > 0)
-          activities.push(`Album mới nhất: ${albums[0].title}`);
+          activities.push(`Album mới nhất: ${albums[0].album_name}`);
         setRecentActivities(activities);
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);

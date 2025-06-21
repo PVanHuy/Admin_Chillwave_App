@@ -29,12 +29,13 @@ export class UserService {
         return {
           id: doc.id,
           email: data.email,
-          displayName: data.username,
-          phoneNumber: data.phone,
-          photoURL: data.photoUrl,
+          username: data.username,
+          bio: data.bio,
+          phone: data.phone,
+          photoUrl: data.photoUrl,
+          position: data.position,
           role: data.role,
-          isActive: data.isActive,
-          createdAt: data.created_at?.toDate(),
+          created_at: data.created_at?.toDate(),
           updatedAt: data.updatedAt?.toDate(),
         } as User;
       });
@@ -51,10 +52,15 @@ export class UserService {
         const data = docSnap.data();
         return {
           id: docSnap.id,
-          ...data,
-          createdAt: data.createdAt?.toDate(),
+          email: data.email,
+          username: data.username,
+          bio: data.bio,
+          phone: data.phone,
+          photoUrl: data.photoUrl,
+          position: data.position,
+          role: data.role,
+          created_at: data.created_at?.toDate(),
           updatedAt: data.updatedAt?.toDate(),
-          lastLoginAt: data.lastLoginAt?.toDate(),
         } as User;
       }
       return null;
@@ -69,12 +75,12 @@ export class UserService {
       const now = Timestamp.now();
       const docRef = await addDoc(collection(db, COLLECTION_NAME), {
         ...userData,
-        phoneNumber: userData.phoneNumber || "",
-        createdAt: now,
+        phone: userData.phone || "",
+        bio: userData.bio || "",
+        position: userData.position || "",
+        photoUrl: userData.photoUrl || "",
+        created_at: now,
         updatedAt: now,
-        favoriteArtists: [],
-        favoriteSongs: [],
-        favoriteAlbums: [],
       });
       return docRef.id;
     } catch (error) {
@@ -113,34 +119,24 @@ export class UserService {
       const querySnapshot = await getDocs(
         query(
           collection(db, COLLECTION_NAME),
-          where("displayName", ">=", searchTerm),
-          where("displayName", "<=", searchTerm + "\uf8ff"),
+          where("username", ">=", searchTerm),
+          where("username", "<=", searchTerm + "\uf8ff"),
           limit(20)
         )
       );
-      return querySnapshot.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-            createdAt: doc.data().createdAt?.toDate(),
-            updatedAt: doc.data().updatedAt?.toDate(),
-            lastLoginAt: doc.data().lastLoginAt?.toDate(),
-          } as User)
-      );
+      return querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          created_at: data.created_at?.toDate(),
+          updatedAt: data.updatedAt?.toDate(),
+        } as User;
+      });
     } catch (error) {
       console.error("Error searching users:", error);
       throw error;
     }
-  }
-
-  static async getActiveUsersCount(): Promise<number> {
-    const q = query(
-      collection(db, COLLECTION_NAME),
-      where("isActive", "==", true)
-    );
-    const snapshot = await getCountFromServer(q);
-    return snapshot.data().count;
   }
 
   static async getAdminCount(): Promise<number> {

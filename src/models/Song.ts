@@ -1,48 +1,32 @@
 export interface Song {
   id: string;
-  title: string;
-  artistId: string;
-  artistName: string;
-  albumId?: string;
-  albumName?: string;
-  duration: number; // in seconds
-  audioURL: string;
-  imageURL?: string;
-  genre: string[];
-  releaseDate: Date;
-  lyrics?: string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  playCount: number;
-  likesCount: number;
-  isExplicit: boolean;
+  song_name: string;
+  artist_id: string[];
+  audio_url: string;
+  country: string;
+  duration: number | null;
+  love_count: number;
+  play_count: number;
+  song_imageUrl: string;
+  year: number;
 }
 
 export interface CreateSongRequest {
-  title: string;
-  artistId: string;
-  albumId?: string;
-  duration: number;
-  audioURL: string;
-  imageURL?: string;
-  genre: string[];
-  releaseDate: Date;
-  lyrics?: string;
-  isActive: boolean;
-  isExplicit: boolean;
+  song_name: string;
+  artist_id: string[];
+  audio_url: string;
+  country: string;
+  duration: number | null;
+  song_imageUrl: string;
+  year: number;
 }
 
 export interface UpdateSongRequest {
-  title?: string;
-  artistId?: string;
-  albumId?: string;
-  duration?: number;
-  audioURL?: string;
-  imageURL?: string;
-  genre?: string[];
-  releaseDate?: Date;
-  lyrics?: string;
-  isActive?: boolean;
-  isExplicit?: boolean;
+  song_name?: string;
+  artist_id?: string[];
+  audio_url?: string;
+  country?: string;
+  duration?: number | null;
+  song_imageUrl?: string;
+  year?: number;
 }

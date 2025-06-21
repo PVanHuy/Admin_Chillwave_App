@@ -7,27 +7,18 @@ import {
   DialogActions,
   Button,
   TextField,
-  Grid,
-  Switch,
-  FormControlLabel,
+  Box,
   Alert,
   Snackbar,
   Chip,
-  Box,
   Autocomplete,
+  Avatar,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import DataTable, {
-  createStatusColumn,
-  createDateColumn,
-  createImageColumn,
-} from "../../components/Common/DataTable";
+import DataTable from "../../components/Common/DataTable";
 import { AlbumService } from "../../services/AlbumService";
 import { ArtistService } from "../../services/ArtistService";
 import { SongService } from "../../services/SongService";
@@ -38,31 +29,6 @@ import {
 } from "../../models/Album";
 import { Artist } from "../../models/Artist";
 import { Song } from "../../models/Song";
-
-const GENRES = [
-  "Pop",
-  "Rock",
-  "Hip Hop",
-  "R&B",
-  "Country",
-  "Jazz",
-  "Classical",
-  "Electronic",
-  "Folk",
-  "Blues",
-  "Reggae",
-  "Punk",
-  "Metal",
-  "Alternative",
-  "Indie",
-  "Soul",
-];
-
-const ALBUM_TYPES = [
-  { value: "album", label: "Album" },
-  { value: "single", label: "Single" },
-  { value: "ep", label: "EP" },
-];
 
 const AlbumsPage: React.FC = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -79,16 +45,11 @@ const AlbumsPage: React.FC = () => {
     severity: "success" as "success" | "error",
   });
 
-  const [formData, setFormData] = useState({
-    title: "",
-    artistId: "",
-    description: "",
-    imageURL: "",
-    genre: [] as string[],
-    releaseDate: new Date(),
-    trackList: [] as string[],
-    isActive: true,
-    type: "album" as "album" | "single" | "ep",
+  const [formData, setFormData] = useState<CreateAlbumRequest>({
+    album_name: "",
+    artist_id: "",
+    album_imageUrl: "",
+    songs_id: [],
   });
 
   useEffect(() => {
@@ -99,8 +60,8 @@ const AlbumsPage: React.FC = () => {
     const lowercasedFilter = searchTerm.toLowerCase();
     const filteredData = albums.filter(
       (item) =>
-        item.title.toLowerCase().includes(lowercasedFilter) ||
-        item.artistName.toLowerCase().includes(lowercasedFilter)
+        item.album_name.toLowerCase().includes(lowercasedFilter) ||
+        getArtistName(item.artist_id)?.toLowerCase().includes(lowercasedFilter)
     );
     setFilteredAlbums(filteredData);
   }, [searchTerm, albums]);
@@ -124,6 +85,10 @@ const AlbumsPage: React.FC = () => {
     }
   };
 
+  const getArtistName = (artistId: string) => {
+    return artists.find((a) => a.id === artistId)?.artist_name;
+  };
+
   const showSnackbar = (message: string, severity: "success" | "error") => {
     setSnackbar({ open: true, message, severity });
   };
@@ -136,28 +101,18 @@ const AlbumsPage: React.FC = () => {
     if (album) {
       setEditingAlbum(album);
       setFormData({
-        title: album.title,
-        artistId: album.artistId,
-        description: album.description,
-        imageURL: album.imageURL || "",
-        genre: album.genre,
-        releaseDate: album.releaseDate,
-        trackList: album.trackList,
-        isActive: album.isActive,
-        type: album.type,
+        album_name: album.album_name,
+        artist_id: album.artist_id,
+        album_imageUrl: album.album_imageUrl || "",
+        songs_id: album.songs_id || [],
       });
     } else {
       setEditingAlbum(null);
       setFormData({
-        title: "",
-        artistId: "",
-        description: "",
-        imageURL: "",
-        genre: [],
-        releaseDate: new Date(),
-        trackList: [],
-        isActive: true,
-        type: "album",
+        album_name: "",
+        artist_id: "",
+        album_imageUrl: "",
+        songs_id: [],
       });
     }
     setDialogOpen(true);
@@ -174,34 +129,12 @@ const AlbumsPage: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      const artist = artists.find((a) => a.id === formData.artistId);
-
       if (editingAlbum) {
-        const updates: UpdateAlbumRequest = {
-          title: formData.title,
-          artistId: formData.artistId,
-          description: formData.description,
-          imageURL: formData.imageURL,
-          genre: formData.genre,
-          releaseDate: formData.releaseDate,
-          trackList: formData.trackList,
-          isActive: formData.isActive,
-          type: formData.type,
-        };
+        const updates: UpdateAlbumRequest = { ...formData };
         await AlbumService.updateAlbum(editingAlbum.id, updates);
         showSnackbar("Cập nhật album thành công", "success");
       } else {
-        const newAlbum: CreateAlbumRequest = {
-          title: formData.title,
-          artistId: formData.artistId,
-          description: formData.description,
-          imageURL: formData.imageURL,
-          genre: formData.genre,
-          releaseDate: formData.releaseDate,
-          trackList: formData.trackList,
-          isActive: formData.isActive,
-          type: formData.type,
-        };
+        const newAlbum: CreateAlbumRequest = { ...formData };
         await AlbumService.createAlbum(newAlbum);
         showSnackbar("Thêm album thành công", "success");
       }
@@ -227,60 +160,36 @@ const AlbumsPage: React.FC = () => {
   };
 
   const availableSongs = songs.filter(
-    (song) => song.artistId === formData.artistId
+    (song) => song.artist_id && song.artist_id.includes(formData.artist_id)
   );
 
   const columns: GridColDef[] = [
-    createImageColumn(),
-    { field: "title", headerName: "Tên album", width: 200 },
-    { field: "artistName", headerName: "Nghệ sĩ", width: 150 },
     {
-      field: "type",
-      headerName: "Loại",
-      width: 100,
-      renderCell: (params) => {
-        const typeLabels = { album: "Album", single: "Single", ep: "EP" };
-        return (
-          <Chip
-            label={typeLabels[params.value as keyof typeof typeLabels]}
-            size="small"
-          />
-        );
-      },
+      field: "album_imageUrl",
+      headerName: "Hình ảnh",
+      width: 80,
+      renderCell: (params) => <Avatar src={params.value} variant="rounded" />,
+    },
+    { field: "album_name", headerName: "Tên album", flex: 2, minWidth: 200 },
+    {
+      field: "artist_id",
+      headerName: "Nghệ sĩ",
+      flex: 1.5,
+      minWidth: 150,
+      valueGetter: (value) => getArtistName(value) || value,
     },
     {
-      field: "genre",
-      headerName: "Thể loại",
-      width: 150,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
-          {params.value?.slice(0, 1).map((genre: string) => (
-            <Chip key={genre} label={genre} size="small" />
-          ))}
-          {params.value?.length > 1 && (
-            <Chip
-              label={`+${params.value.length - 1}`}
-              size="small"
-              color="primary"
-            />
-          )}
-        </Box>
-      ),
-    },
-    {
-      field: "trackList",
+      field: "songs_id",
       headerName: "Số bài hát",
-      width: 100,
-      valueFormatter: (value: string[]) => value?.length || 0,
+      width: 120,
+      align: "center",
+      headerAlign: "center",
+      valueGetter: (value: string[]) => value?.length || 0,
     },
-    { field: "playCount", headerName: "Lượt phát", width: 100 },
-    { field: "likesCount", headerName: "Lượt thích", width: 100 },
-    createStatusColumn(),
-    createDateColumn("releaseDate", "Ngày phát hành"),
   ];
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <>
       <DataTable
         title="Quản lý album"
         columns={columns}
@@ -307,140 +216,47 @@ const AlbumsPage: React.FC = () => {
           {editingAlbum ? "Chỉnh sửa album" : "Thêm album mới"}
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                flexDirection: { xs: "column", md: "row" },
-              }}
-            >
-              <TextField
-                fullWidth
-                label="Tên album"
-                value={formData.title}
-                onChange={(e) => handleInputChange("title", e.target.value)}
-                required
-              />
-              <FormControl fullWidth required>
-                <InputLabel>Nghệ sĩ</InputLabel>
-                <Select
-                  value={formData.artistId}
-                  label="Nghệ sĩ"
-                  onChange={(e) =>
-                    handleInputChange("artistId", e.target.value)
-                  }
-                >
-                  {artists.map((artist) => (
-                    <MenuItem key={artist.id} value={artist.id}>
-                      {artist.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 1 }}>
             <TextField
               fullWidth
-              label="Mô tả"
-              value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              multiline
-              rows={3}
+              label="Tên album"
+              value={formData.album_name}
+              onChange={(e) => handleInputChange("album_name", e.target.value)}
               required
             />
+            <FormControl fullWidth required>
+              <InputLabel>Nghệ sĩ</InputLabel>
+              <Select
+                value={formData.artist_id}
+                label="Nghệ sĩ"
+                onChange={(e) => handleInputChange("artist_id", e.target.value)}
+              >
+                {artists.map((artist) => (
+                  <MenuItem key={artist.id} value={artist.id}>
+                    {artist.artist_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
             <TextField
               fullWidth
               label="URL hình ảnh"
-              value={formData.imageURL}
-              onChange={(e) => handleInputChange("imageURL", e.target.value)}
+              value={formData.album_imageUrl}
+              onChange={(e) =>
+                handleInputChange("album_imageUrl", e.target.value)
+              }
             />
-
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                flexDirection: { xs: "column", md: "row" },
-              }}
-            >
-              <Autocomplete
-                multiple
-                options={GENRES}
-                value={formData.genre}
-                onChange={(_, value) => handleInputChange("genre", value)}
-                renderInput={(params) => (
-                  <TextField {...params} label="Thể loại âm nhạc" />
-                )}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip
-                      variant="outlined"
-                      label={option}
-                      {...getTagProps({ index })}
-                      key={option}
-                    />
-                  ))
-                }
-                sx={{ flex: 1 }}
-              />
-              <FormControl sx={{ flex: 1 }} required>
-                <InputLabel>Loại album</InputLabel>
-                <Select
-                  value={formData.type}
-                  label="Loại album"
-                  onChange={(e) => handleInputChange("type", e.target.value)}
-                >
-                  {ALBUM_TYPES.map((type) => (
-                    <MenuItem key={type.value} value={type.value}>
-                      {type.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: "flex-start",
-              }}
-            >
-              <DatePicker
-                label="Ngày phát hành"
-                value={formData.releaseDate}
-                onChange={(date) =>
-                  handleInputChange("releaseDate", date || new Date())
-                }
-                slotProps={{ textField: { fullWidth: true } }}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.isActive}
-                    onChange={(e) =>
-                      handleInputChange("isActive", e.target.checked)
-                    }
-                  />
-                }
-                label="Kích hoạt album"
-                sx={{ mt: 2 }}
-              />
-            </Box>
 
             <Autocomplete
               multiple
               options={availableSongs}
-              getOptionLabel={(option) => option.title}
-              value={availableSongs.filter((song) =>
-                formData.trackList.includes(song.id)
-              )}
+              getOptionLabel={(option) => option.song_name}
+              value={songs.filter((s) => formData.songs_id.includes(s.id))}
               onChange={(_, value) =>
                 handleInputChange(
-                  "trackList",
-                  value.map((song) => song.id)
+                  "songs_id",
+                  value.map((v) => v.id)
                 )
               }
               renderInput={(params) => (
@@ -450,13 +266,13 @@ const AlbumsPage: React.FC = () => {
                 value.map((option, index) => (
                   <Chip
                     variant="outlined"
-                    label={option.title}
+                    label={option.song_name}
                     {...getTagProps({ index })}
                     key={option.id}
                   />
                 ))
               }
-              disabled={!formData.artistId}
+              disabled={!formData.artist_id}
             />
           </Box>
         </DialogContent>
@@ -477,7 +293,7 @@ const AlbumsPage: React.FC = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </LocalizationProvider>
+    </>
   );
 };
 
