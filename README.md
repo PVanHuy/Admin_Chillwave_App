@@ -98,13 +98,15 @@ Cơ sở dữ liệu sử dụng các collection và lược đồ sau:
 
 ```typescript
 {
-  uid: string,
   username: string,
   email: string,
-  phone: string, 
-  photoURL: string,
+  bio?: string,
+  phone?: string,
+  photoUrl?: string,
+  position?: string,
   role: 'admin' | 'user',
-  createdAt: Date
+  created_at: Date,
+  updatedAt: Date
 }
 ```
 
@@ -115,15 +117,7 @@ Cơ sở dữ liệu sử dụng các collection và lược đồ sau:
   artist_name: string,
   artist_images: string,
   bio: string,
-  country: string,
-  genre: string[],
-  love_count: number,
-  socialLinks: {
-    spotify?: string;
-    youtube?: string;
-    instagram?: string;
-    facebook?: string;
-  }
+  love_count: number
 }
 ```
 
@@ -133,16 +127,13 @@ Cơ sở dữ liệu sử dụng các collection và lược đồ sau:
 {
   song_name: string,
   artist_id: string[],
-  album_id?: string,
-  duration: number,
   audio_url: string,
-  song_imageUrl: string,
-  genre: string[],
-  year: number, 
-  lyrics?: string,
-  isExplicit: boolean,
+  country: string,
+  duration: number | null,
+  love_count: number,
   play_count: number,
-  love_count: number
+  song_imageUrl: string,
+  year: number
 }
 ```
 
@@ -152,13 +143,8 @@ Cơ sở dữ liệu sử dụng các collection và lược đồ sau:
 {
   album_name: string,
   artist_id: string,
-  description: string,
-  album_image: string,
-  genre: string[],
-  releaseDate: Date,
-  trackList: string[],
-  isActive: boolean,
-  type: 'album' | 'single' | 'ep'
+  album_imageUrl: string,
+  songs_id: string[]
 }
 ```
 
